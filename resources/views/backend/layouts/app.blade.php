@@ -13,6 +13,29 @@
     <link href="{{ mix('css/backend.css') }}" rel="stylesheet">
     <livewire:styles />
     @stack('after-styles')
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
+    <script type="text/javascript">
+      google.charts.load('current', {'packages':['bar', 'corechart']});
+      google.charts.setOnLoadCallback(drawCharts);
+
+      function drawCharts() {
+        var data, options, chart;
+        @if (count($dateData ?? []) > 1)
+        data = google.visualization.arrayToDataTable({!! json_encode($dateData ?? []) !!});
+        options = {};
+        chart = new google.charts.Bar(document.getElementById('barchart_material'));
+        chart.draw(data, google.charts.Bar.convertOptions(options));
+        @endif
+
+        @if (count($typeData ?? []) > 1)
+        data = google.visualization.arrayToDataTable({!! json_encode($typeData ?? []) !!});
+        chart = new google.visualization.PieChart(document.getElementById('piechart_3d'));
+        chart.draw(data, options);
+        @endif
+      }
+    </script>
+
 </head>
 <body class="c-app">
     @include('backend.includes.sidebar')

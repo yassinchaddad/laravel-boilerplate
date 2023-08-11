@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Frontend\User;
 
 use App\Domains\Auth\Services\UserService;
 use App\Http\Requests\Frontend\User\UpdateProfileRequest;
+use Illuminate\Support\Facades\Storage;
 
 /**
  * Class ProfileController.
@@ -17,6 +18,10 @@ class ProfileController
      */
     public function update(UpdateProfileRequest $request, UserService $userService)
     {
+        if ($request->hasFile('profile_picture')) {
+            abort_unless(Storage::disk('public')->putFileAs('avatars', $request->file('profile_picture'), md5(strtolower(trim($request->user()->email))).'.jpg'), 500);
+        }
+        
         $userService->updateProfile($request->user(), $request->validated());
 
         if (session()->has('resent')) {
