@@ -3,6 +3,7 @@
 namespace App\Domains\Auth\Models\Traits\Method;
 
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Storage;
 
 /**
  * Trait UserMethod.
@@ -98,6 +99,10 @@ trait UserMethod
      */
     public function getAvatar($size = null)
     {
+        if (Storage::disk('public')->exists('avatars/'.md5(strtolower(trim($this->email))).'.jpg')) {
+            return url('/storage/avatars/'.md5(strtolower(trim($this->email))).'.jpg');
+
+        }
         return 'https://gravatar.com/avatar/'.md5(strtolower(trim($this->email))).'?s='.config('boilerplate.avatar.size', $size).'&d=mp';
     }
 }

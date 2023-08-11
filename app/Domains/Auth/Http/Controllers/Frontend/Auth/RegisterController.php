@@ -8,6 +8,7 @@ use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use LangleyFoxall\LaravelNISTPasswordRules\PasswordRules;
+use Illuminate\Support\Facades\Storage;
 
 /**
  * Class RegisterController.
@@ -77,6 +78,7 @@ class RegisterController
             'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users')],
             'password' => array_merge(['max:100'], PasswordRules::register($data['email'] ?? null)),
             'terms' => ['required', 'in:1'],
+            'profile_picture' => ['required', 'image'],
             'g-recaptcha-response' => ['required_if:captcha_status,true', new Captcha],
         ], [
             'terms.required' => __('You must accept the Terms & Conditions.'),
@@ -95,7 +97,8 @@ class RegisterController
     protected function create(array $data)
     {
         abort_unless(config('boilerplate.access.user.registration'), 404);
-
+        abort_unless(Storage::disk('public')->putFileAs('avatars', $data['profile_picture'], md5(strtolower(trim($data['email']))).'.jpg'), 500);
+        
         return $this->userService->registerUser($data);
     }
 }
